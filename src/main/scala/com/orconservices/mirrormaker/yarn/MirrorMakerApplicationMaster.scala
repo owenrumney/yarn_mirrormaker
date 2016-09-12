@@ -15,31 +15,24 @@ import scala.collection.JavaConversions._
 
 class MirrorMakerApplicationMaster {
 
-  val LOG = LoggerFactory.getLogger(classOf[MirrorMakerApplicationMaster])
+  private val LOG = LoggerFactory.getLogger(classOf[MirrorMakerApplicationMaster])
 
   def main(args: Array[String]) {
-    try {
-      val amConf = ApplicationMasterConfig(args)
-      val timesToRetry: Int = System.getProperty(YarnConstants.ContainerRetryCountKey, YarnConstants.ContainerRetryCountDefault).toInt
-      val attempt: Int = 0
-      var completedSuccessfully: Boolean = false
-      while (attempt < timesToRetry) {
-        addContainerAttempt(attempt, amConf.rmClient)
-        if (startAndWaitForCompletion(attempt + 1, amConf)) {
-          completedSuccessfully = true
-        }
-        LOG.info("Container failed on attempt {} of {}", attempt, timesToRetry)
+    val amConf = ApplicationMasterConfig(args)
+    val timesToRetry: Int = System.getProperty(YarnConstants.ContainerRetryCountKey, YarnConstants.ContainerRetryCountDefault).toInt
+    val attempt: Int = 0
+    var completedSuccessfully: Boolean = false
+    while (attempt < timesToRetry) {
+      addContainerAttempt(attempt, amConf.rmClient)
+      if (startAndWaitForCompletion(attempt + 1, amConf)) {
+        completedSuccessfully = true
       }
-      LOG.debug("unregister")
-      if (completedSuccessfully) amConf.rmClient.unregisterApplicationMaster(FinalApplicationStatus.SUCCEEDED, "", "")
-      else amConf.rmClient.unregisterApplicationMaster(FinalApplicationStatus.FAILED, "", "")
-      LOG.debug("exiting")
+      LOG.info("Container failed on attempt {} of {}", attempt, timesToRetry)
     }
-    catch {
-      case t: Throwable => {
-        t.printStackTrace()
-      }
-    }
+    LOG.debug("unregister")
+    if (completedSuccessfully) amConf.rmClient.unregisterApplicationMaster(FinalApplicationStatus.SUCCEEDED, "", "")
+    else amConf.rmClient.unregisterApplicationMaster(FinalApplicationStatus.FAILED, "", "")
+    LOG.debug("exiting")
   }
 
   private def startAndWaitForCompletion(attempt: Int, amConf: Config): Boolean = {

@@ -18,17 +18,16 @@ class MirrorMakerYarnClient(val properties: Properties) {
 
 
   private val LOG = LoggerFactory.getLogger("mirrormaker.yarn.application.MirrorMakerYarnClient")
-  private val JOB_WHITELIST_PROPERTY: String = "job.whitelist"
-  private val JOB_TOPICMUTATOR_CLASS_PROPERTY: String = "job.topicmutator.class"
-  private val JOB_TOPICMUTATOR_ARGS_PROPERTY: String = "job.topicmutator.args"
-  private val JOB_NAME_PROPERTY: String = "job.name"
+  private val JobWhitelistProperty: String = "job.whitelist"
+  private val JobTopicMutatorClassProperty: String = "job.topicmutator.class"
+  private val JobTopicMutatorArgsProperty: String = "job.topicmutator.args"
+  private val JobNameProperty: String = "job.name"
   private val localResources: Map[String, LocalResource] = Maps.newHashMap[String, LocalResource]
 
   def run(): Unit = {
     LOG.info("Starting the yarn client")
-    verifyProperties(JOB_NAME_PROPERTY, JOB_WHITELIST_PROPERTY)
+    verifyProperties(JobNameProperty, JobWhitelistProperty)
     val conf = new YarnConfiguration
-
 
     val container: ContainerLaunchContext = Records.newRecord(classOf[ContainerLaunchContext])
     container.setLocalResources(mapAsJavaMap[String, LocalResource](localResources))
@@ -36,11 +35,9 @@ class MirrorMakerYarnClient(val properties: Properties) {
     container.setCommands(MirrorMakerCommandLineBuilder(properties))
   }
 
+
   private def verifyProperties(requiredProperties: String*) {
-    for (propertyName <- requiredProperties) {
-      val property: String = properties.getProperty(propertyName)
-      assert(!property.isEmpty)
-    }
+    requiredProperties.ensuring(_.nonEmpty)
   }
 
   object MirrorMakerCommandLineBuilder {
@@ -55,12 +52,12 @@ class MirrorMakerYarnClient(val properties: Properties) {
       commandBuilder.add("--producer.config producer.properties")
       commandBuilder.add("--consumer.config consumer.properties")
       commandBuilder.add("--whitelist")
-      commandBuilder.add(properties.getProperty(JOB_WHITELIST_PROPERTY))
+      commandBuilder.add(properties.getProperty(JobWhitelistProperty))
 
-      val topicMutator: String = properties.getProperty(JOB_TOPICMUTATOR_CLASS_PROPERTY)
-      val topicMutatorArgs: String = properties.getProperty(JOB_TOPICMUTATOR_ARGS_PROPERTY)
+      val topicMutator: String = properties.getProperty(JobTopicMutatorClassProperty)
+      val topicMutatorArgs: String = properties.getProperty(JobTopicMutatorArgsProperty)
 
-      if (!topicMutator.isEmpty) commandBuilder.add(String.format("--message.handler %s --message.handler.args %s", topicMutator, topicMutatorArgs))
+      if (topicMutator.nonEmpty) commandBuilder.add(String.format("--message.handler %s --message.handler.args %s", topicMutator, topicMutatorArgs))
 
       val jobConfig: Properties = PropertyFileExtractor(properties, "job.config.")
       import scala.collection.JavaConversions._

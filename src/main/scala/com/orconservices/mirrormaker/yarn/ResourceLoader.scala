@@ -1,6 +1,6 @@
 package com.orconservices.mirrormaker.yarn
 
-import java.io.{File, IOException}
+import java.io.File
 import java.util
 
 import com.google.common.collect.Maps
@@ -19,7 +19,7 @@ object ResourceLoader {
   def createLocalResource(src: Path, conf: Configuration): LocalResource = {
     val fs: FileSystem = FileSystem.get(conf)
     val dest: Path = new Path(fs.getHomeDirectory, src.getName)
-    LOG.info("Copying source from {} to {}", src.getName, dest.getName:Any)
+    LOG.info("Copying source from {} to {}", src.getName, dest.getName: Any)
     fs.copyFromLocalFile(src, dest)
     val sourceStat: FileStatus = FileSystem.get(conf).getFileStatus(dest)
     val localResource: LocalResource = Records.newRecord(classOf[LocalResource])
@@ -35,10 +35,10 @@ object ResourceLoader {
     val appEnv: util.HashMap[String, String] = Maps.newHashMap[String, String]
 
     conf.getStrings(YarnConfiguration.YARN_APPLICATION_CLASSPATH, YarnConfiguration.DEFAULT_YARN_APPLICATION_CLASSPATH: _*).foreach(c => {
-      Apps.addToEnvironment(appEnv, ApplicationConstants.Environment.CLASSPATH.name(), c.trim)
+      Apps addToEnvironment(appEnv, ApplicationConstants.Environment.CLASSPATH.name(), c.trim, File.pathSeparator)
     })
 
-    Apps.addToEnvironment(appEnv, ApplicationConstants.Environment.CLASSPATH.name, ApplicationConstants.Environment.PWD.$ + File.separator + "*")
+    Apps.addToEnvironment(appEnv, ApplicationConstants.Environment.CLASSPATH.name, ApplicationConstants.Environment.PWD.$ + File.separator + "*", File.pathSeparator)
     appEnv
   }
 }

@@ -8,8 +8,8 @@ import org.slf4j.{Logger, LoggerFactory}
 
 object MirrorMakerDriver {
 
-  val ConfigFileArg: String = "config-path"
-  val LOG: Logger = LoggerFactory.getLogger("MirrorMakerDriver")
+  private val ConfigFileArg: String = "config-path"
+  private val LOG: Logger = LoggerFactory.getLogger("MirrorMakerDriver")
 
   val OPTIONS = {
     val options = new Options()
