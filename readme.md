@@ -18,7 +18,7 @@ Handlers that have been provided are in this project are;
 ### PrefixTopicMutatorMessageHandler
 This message handler will mutate the topic name of the record with a prefix which is passed in the in the `message.handler.args` parameter when calling the Mirror-Maker class.
 
-For example, if the topic being consumed is `event` and the prefix parameter is `skyscape_`, the producer will write to the topic `skyscape_event`
+For example, if the topic being consumed is `test_topic` and the prefix parameter is `mirrored_`, the producer will write to the topic `mirrored_test_topic`
 
 ### SuffixTopicMutatorMessageHandler
 This message handler will mutate the topic name of the record with a suffix which is passed in the in the `message.handler.args` parameter when calling the Mirror-Maker class.
