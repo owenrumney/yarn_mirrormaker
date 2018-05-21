@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/owenrumney/yarn_mirrormaker.svg?branch=master)](https://travis-ci.org/owenrumney/yarn_mirrormaker)
+
 # Kafka Mirror-Maker Supporting Code
 
 ## Overview
